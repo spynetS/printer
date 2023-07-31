@@ -42,7 +42,7 @@ Snake *getLastSnake(Snake *head){
 void setSnake(Canvas*canvas,Snake *head){
     Snake *prev = head->next;
     while(prev != NULL){
-        setPixelWithPixel(canvas, *prev->pixel);
+        setPixelWithPixel(canvas, prev->pixel);
         prev = prev->next;
     }
 }
@@ -53,6 +53,8 @@ void freeSnake(Snake *head){
     }
 }
 void checkSnakeDeath(Snake *head){
+
+    //check if it hits itsself
     Snake *prev = head->next;
     Snake *last = getLastSnake(head);
 
@@ -66,7 +68,6 @@ void checkSnakeDeath(Snake *head){
         }
         prev = prev->next;
     }
-
 }
 
 int main(){
@@ -77,19 +78,19 @@ int main(){
 
 
     Canvas *canvas = newCanvas(20,20,".",BLUE);
-    
+     
 
-    Pixel *apple = newPixel(10, 10, "@", RED);
+    Pixel *apple = newPixel(10, 19, "@", RED);
     
+    //snake direction
     int x = 1;
     int y = 0;
-
     while(1){
         system("clear");
         
         clearPixels(canvas);
         setText(canvas, 20/2-2, 0, "CNAKE", WHITE);
-        setPixelWithPixel(canvas, *apple);
+        setPixelWithPixel(canvas, apple);
         setSnake(canvas,head);
 
         char c = getKeyPressed();
@@ -101,11 +102,11 @@ int main(){
             x = 0;
             y = 1;
         }
-        if(c == 'a' && x != 1) {
+        if((c == 'a' || c == 'W') && x != 1) {
             x = -1;
             y = 0;
         }
-        if(c == 'd' && x != -1) {
+        if(c == 'd' || c == 26 && x != -1) {
             x = 1;
             y = 0;
         }
@@ -114,6 +115,21 @@ int main(){
         removeSnake(head);
 
         checkSnakeDeath(head);
+
+        //check edges    
+        Pixel *last = getLastSnake(head)->pixel;
+        if(last->x > canvas->width){
+            exit(0);
+        }
+        if(last->x < -1){
+            exit(0);
+        }
+        if(last->y > canvas->height){
+            exit(0);
+        }
+        if(last->y < -1){
+            exit(0);
+        }
 
 
         draw(canvas);

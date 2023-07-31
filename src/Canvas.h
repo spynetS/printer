@@ -100,7 +100,7 @@ void clearPixels(Canvas *canvas);
 /** sets the pixel at x,y with the data */
 void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color);
 /** set the pixel with the pixel arg */
-void setPixelWithPixel(Canvas *canvas, Pixel pixel);
+void setPixelWithPixel(Canvas *canvas, Pixel *pixel);
 /** Sets the text at begining of x and at row y */
 void setText(Canvas *canvas, int _x, int _y, char* text, char* color);
 /** Internal function. Adds string to a list so we can free it later */

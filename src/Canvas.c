@@ -19,7 +19,7 @@ Canvas *newCanvas(int width, int height, char* bgCh, char* color){
     return canvas;
 }
 Pixel *newPixel(int x, int y, char* ch, char* color){
-    Pixel *pixel = (Pixel*)malloc(sizeof(pixel));
+    Pixel *pixel = (Pixel*)malloc(sizeof(Pixel));
     pixel->x = x;
     pixel->y = y;
     pixel->ch = ch;
@@ -41,14 +41,24 @@ void freeCanvas(Canvas *canvas){
 }
 
 void draw(Canvas *canvas){
-    int w = 20;
-    int h = 20;
+    // to keep track in what x coord we are priting
+    int x = 0;
     for(int i = 0; i < canvas->width*canvas->height; i++){
-        if(i%canvas->height==0) printf("\n");
-        if(strlen(canvas->pixels[i].ch)<2)
+
+        // if the pixel has less then 2 chars we dont print with a space
+        if(strlen(canvas->pixels[i].ch) < 2)
             printf("%s%s ",canvas->pixels[i].color,canvas->pixels[i].ch);
         else
             printf("%s%s",canvas->pixels[i].color,canvas->pixels[i].ch);
+
+        // if x == width -1 we start on the next row
+        if(x == canvas->width-1){
+            printf("\n");
+            x=-1;
+        }
+        x++;
+
+
 
     }
 }
@@ -73,8 +83,8 @@ void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color){
         }
     }
 }
-void setPixelWithPixel(Canvas *canvas, Pixel pixel){
-    setPixel(canvas, pixel.x, pixel.y, pixel.ch, pixel.color);
+void setPixelWithPixel(Canvas *canvas, Pixel *pixel){
+    setPixel(canvas, pixel->x, pixel->y, pixel->ch, pixel->color);
 }
 
 
