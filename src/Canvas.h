@@ -55,6 +55,14 @@ typedef struct pixel
 
 /** 
 The canvas to set pixels to print to stdout 
+
+if the canvas ch property is one char every other char will also be one
+if it is 2 all the others will also be 2.
+if they are set only to one size the next will be a space.
+
+when you use 2 chars one pixel will appear square because a
+char is 2 tall and 1 width
+
 usage:
 
     //creating a new canvas 20 width and 20 height
@@ -117,10 +125,11 @@ void setText(Canvas *canvas, int _x, int _y, char* text, char* color, char* bgco
 void setBgOfPixel(Canvas *canvas, int x, int y, char* bgcolor);
 /** Internal function. Adds string to a list so we can free it later */
 void addString(Canvas*, char *newStr);
+
+void setFullScreen(Canvas* canvas);
+
 /** prints all the pixels set in the canvas (prints with a space after to make it appear square)*/
 void draw(Canvas *canvas);
-/** prints all the pixels */
-void drawMono(Canvas *canvas);
 /** frees the canvas */
 void freeCanvas(Canvas *canvas);
 /** returns a new pixel with the data */

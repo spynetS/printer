@@ -2,21 +2,53 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Canvas.h"
+#include <sys/ioctl.h>
+#include <stdio.h>
+#include <unistd.h>
 
+void setFullScreen(Canvas* canvas){
+    struct winsize size;
+
+    // Use the ioctl system call to get the terminal size
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &size) == -1) {
+        perror("ioctl");
+    }
+
+    int width;
+    if(strlen(canvas->bgCh) > 1)
+        width = size.ws_col/2;
+    else
+        width = size.ws_col;
+    int height = size.ws_row;
+
+    canvas->width = width;
+    canvas->height = height;
+
+    free(canvas->pixels);
+    canvas->pixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
+
+    for(int i = 0; i < width*height; i ++){
+        canvas->pixels[i].ch = canvas->bgCh;
+        canvas->pixels[i].color = canvas->color;
+        canvas->pixels[i].bgcolor = canvas->color;
+    }
+
+}
 
 Canvas *newCanvas(int width, int height, char* bgCh, char* color){
     Canvas *canvas = malloc(sizeof(Canvas));
     canvas->bgCh = bgCh;
     canvas->color = color;
-    canvas->pixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
     canvas->width = width;
     canvas->height = height;
 
+    canvas->pixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
     for(int i = 0; i < width*height; i ++){
         canvas->pixels[i].ch = bgCh;
         canvas->pixels[i].color = color;
         canvas->pixels[i].bgcolor = color;
     }
+    printf("\033[?25h");
     return canvas;
 }
 Pixel *newPixel(int x, int y, char* ch, char* color,char* bgcolor){
@@ -38,6 +70,7 @@ void freeStrings(Canvas *canvas){
 }
 
 void freeCanvas(Canvas *canvas){
+    printf("\033[?25h");
     freeStrings(canvas);
     free(canvas->strings);
     free(canvas);
@@ -48,9 +81,9 @@ void draw(Canvas *canvas){
     int x = 0;
     for(int i = 0; i < canvas->width*canvas->height; i++){
         Pixel pixel = canvas->pixels[i];
-        // if the pixel has less then 2 chars we dont print with a space
-        if(strlen(pixel.ch) < 2)
-            printf("%s%s%s ",pixel.bgcolor,pixel.color,pixel.ch);
+
+        if(strlen(canvas->bgCh) > 1 && strlen(pixel.ch) < 2)
+            printf("%s%s%s ",pixel.color,pixel.bgcolor,pixel.ch);
         else
             printf("%s%s%s",pixel.color,pixel.bgcolor,pixel.ch);
 
@@ -62,16 +95,8 @@ void draw(Canvas *canvas){
         }
         x++;
     }
+    printf("\033[?25l");
 }
-void drawMono(Canvas *canvas){
-    int w = 20;
-    int h = 20;
-    for(int i = 0; i < canvas->width*canvas->height; i++){
-        if(i%canvas->height==0) printf("\n");
-        printf("%s%s",canvas->pixels[i].color,canvas->pixels[i].ch);
-    }
-}
-
 void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor){
     int index = 0;
     for(int y = 0; y < canvas->height; y++){
