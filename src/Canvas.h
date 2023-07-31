@@ -1,6 +1,5 @@
 
-/**
-    (Alfred Roos 2023-07-29)
+/*BG_BLACK    (Alfred Roos 2023-07-29)
     USE AS IS
     This library makes printing to the termninal alot easier.
     Instead of fomrating your prints yourself with a lot of for
@@ -21,15 +20,25 @@
 */
 
 
+#define BG_BLACK  "\x1b[40m"
+#define BG_RED    "\x1b[41m"
+#define BG_GREEN  "\x1b[42m"
+#define BG_YELLOW "\x1b[43m"
+#define BG_BLUE   "\x1b[44m"
+#define BG_PURPLE "\x1b[45m"
+#define BG_CYAN   "\x1b[46m" 
+#define BG_WHITE  "\x1b[47m"
 
-#define BLACK  "\033[0;30m"
-#define RED    "\033[0;31m"
-#define GREEN  "\033[0;32m"
-#define YELLOW "\033[0;33m"
-#define BLUE   "\033[0;34m"
-#define PURPLE "\033[0;35m"
-#define CYAN   "\033[0;36m" 
-#define WHITE  "\033[0;37m"
+#define BLACK  "\x1b[30m"
+#define RED    "\x1b[31m"
+#define GREEN  "\x1b[32m"
+#define YELLOW "\x1b[33m"
+#define BLUE   "\x1b[34m"
+#define PURPLE "\x1b[35m"
+#define CYAN   "\x1b[36m" 
+#define WHITE  "\x1b[37m"
+#define BG     "██"
+#define RESET "\x1b[0m"
 
 
 /** a struct to hold data a pixel needs */
@@ -39,6 +48,7 @@ typedef struct pixel
     int x;
     int y;
     char* color;
+    char* bgcolor;
 
 }Pixel;
 
@@ -98,11 +108,13 @@ typedef struct canvas
 /** Sets all pixelts to default pixels (clears all set) */
 void clearPixels(Canvas *canvas);
 /** sets the pixel at x,y with the data */
-void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color);
+void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor);
 /** set the pixel with the pixel arg */
 void setPixelWithPixel(Canvas *canvas, Pixel *pixel);
 /** Sets the text at begining of x and at row y */
-void setText(Canvas *canvas, int _x, int _y, char* text, char* color);
+void setText(Canvas *canvas, int _x, int _y, char* text, char* color, char* bgcolor);
+
+void setBgOfPixel(Canvas *canvas, int x, int y, char* bgcolor);
 /** Internal function. Adds string to a list so we can free it later */
 void addString(Canvas*, char *newStr);
 /** prints all the pixels set in the canvas (prints with a space after to make it appear square)*/
@@ -112,7 +124,7 @@ void drawMono(Canvas *canvas);
 /** frees the canvas */
 void freeCanvas(Canvas *canvas);
 /** returns a new pixel with the data */
-Pixel *newPixel(int x, int y, char* ch, char* color);
+Pixel *newPixel(int x, int y, char* ch, char* color, char* bgcolor);
 /** returns new canvas with the data */
 Canvas *newCanvas(int width, int height, char* bgCh, char* color);
 

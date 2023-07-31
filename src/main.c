@@ -11,7 +11,7 @@ typedef struct snake{
 
 Snake *newSnake(int x, int y){
     Snake *snake = (Snake*)malloc(sizeof(Snake));
-    snake->pixel = newPixel(x,y,"#",GREEN);
+    snake->pixel = newPixel(x,y,BG,GREEN, BG_BLUE);
     
     return snake;
 }
@@ -42,9 +42,14 @@ Snake *getLastSnake(Snake *head){
 void setSnake(Canvas*canvas,Snake *head){
     Snake *prev = head->next;
     while(prev != NULL){
+        if(prev->next == NULL)
+            prev->pixel->ch = "😎";
+        else
+            prev->pixel->ch = BG;
         setPixelWithPixel(canvas, prev->pixel);
         prev = prev->next;
     }
+
 }
 
 void freeSnake(Snake *head){
@@ -77,10 +82,10 @@ int main(){
     addSnake(head, 3,10);
 
 
-    Canvas *canvas = newCanvas(20,20,".",BLUE);
+    Canvas *canvas = newCanvas(20,20,BG,BLACK);
      
 
-    Pixel *apple = newPixel(10, 19, "@", RED);
+    Pixel *apple = newPixel(10, 19, "🍎", RED, BG_BLACK);
     
     //snake direction
     int x = 1;
@@ -89,7 +94,7 @@ int main(){
         system("clear");
         
         clearPixels(canvas);
-        setText(canvas, 20/2-2, 0, "CNAKE", WHITE);
+        setText(canvas, 20/2-2, 0, "CNAKE", WHITE, BG_RED);
         setPixelWithPixel(canvas, apple);
         setSnake(canvas,head);
 
