@@ -77,26 +77,35 @@ void freeCanvas(Canvas *canvas){
 }
 
 void draw(Canvas *canvas){
-    // to keep track in what x coord we are priting
+    printf("%s",canvas->render);
+}
+
+void setRender(Canvas *canvas){
+
+    char* render = malloc(sizeof(char*)*canvas->height*canvas->width*3);
+    
     int x = 0;
     for(int i = 0; i < canvas->width*canvas->height; i++){
         Pixel pixel = canvas->pixels[i];
 
         if(strlen(canvas->bgCh) > 1 && strlen(pixel.ch) < 2)
-            printf("%s%s%s ",pixel.color,pixel.bgcolor,pixel.ch);
+            sprintf(render,"%s%s%s%s ",render,pixel.color,pixel.bgcolor,pixel.ch);
         else
-            printf("%s%s%s",pixel.color,pixel.bgcolor,pixel.ch);
+            sprintf(render,"%s%s%s%s",render,pixel.color,pixel.bgcolor,pixel.ch);
 
-        printf(RESET);
+        sprintf(render,"%s%s",render,RESET);
         // if x == width -1 we start on the next row
         if(x == canvas->width-1){
-            printf("\n");
+            sprintf(render,"%s\n",render);
             x=-1;
         }
         x++;
     }
-    printf("\033[?25l");
+    sprintf(render,"%s\033[?25l",render);
+    canvas->render = render;
+
 }
+
 void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor){
     int index = 0;
     for(int y = 0; y < canvas->height; y++){

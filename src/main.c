@@ -91,9 +91,9 @@ int main(){
     int x = 1;
     int y = 0;
     while(1){
-        system("clear");
+        //system("clear");
         
-        clearPixels(canvas);
+        //clearPixels(canvas);
         setText(canvas, 20/2-2, 0, "CNAKE", WHITE, BG_RED);
         setPixelWithPixel(canvas, apple);
         setSnake(canvas,head);
@@ -137,7 +137,8 @@ int main(){
         }
 
 
-        draw(canvas);
+        // draw(canvas);
+        printf("%s",canvas->render);
         
         Snake *top = getLastSnake(head);
         if(top->pixel->x == apple->x && top->pixel->y == apple->y){

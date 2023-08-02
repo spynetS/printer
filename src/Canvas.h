@@ -107,12 +107,14 @@ typedef struct canvas
     Pixel *pixels;
     char** strings;
     int numStrings;
+    char* render;
 
 }Canvas;
 
 /**  */
 
 //canvas.c
+void setRender(Canvas *canvas);
 /** Sets all pixelts to default pixels (clears all set) */
 void clearPixels(Canvas *canvas);
 /** sets the pixel at x,y with the data */
