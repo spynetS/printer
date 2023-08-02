@@ -105,6 +105,7 @@ typedef struct canvas
     char* bgCh;
     char* color;
     Pixel *pixels;
+    Pixel *prevPixels;
     char** strings;
     int numStrings;
     char* render;
@@ -112,7 +113,9 @@ typedef struct canvas
 }Canvas;
 
 /**  */
+void setCursorPosition(int x, int y);
 
+void setCharAt(int x, int y, char *c);
 //canvas.c
 void setRender(Canvas *canvas);
 /** Sets all pixelts to default pixels (clears all set) */

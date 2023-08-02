@@ -32,6 +32,14 @@ void setFullScreen(Canvas* canvas){
         canvas->pixels[i].color = canvas->color;
         canvas->pixels[i].bgcolor = canvas->color;
     }
+    free(canvas->prevPixels);
+    canvas->prevPixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
+
+    for(int i = 0; i < width*height; i ++){
+        canvas->prevPixels[i].ch = "";
+        canvas->prevPixels[i].color = canvas->color;
+        canvas->prevPixels[i].bgcolor = canvas->color;
+    }
 
 }
 
@@ -47,6 +55,12 @@ Canvas *newCanvas(int width, int height, char* bgCh, char* color){
         canvas->pixels[i].ch = bgCh;
         canvas->pixels[i].color = color;
         canvas->pixels[i].bgcolor = color;
+    }
+    canvas->prevPixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
+    for(int i = 0; i < width*height; i ++){
+        canvas->prevPixels[i].ch = "";
+        canvas->prevPixels[i].color = color;
+        canvas->prevPixels[i].bgcolor = color;
     }
     printf("\033[?25h");
     return canvas;
@@ -77,9 +91,55 @@ void freeCanvas(Canvas *canvas){
 }
 
 void draw(Canvas *canvas){
-    printf("%s",canvas->render);
+    
+    if(canvas->prevPixels != NULL){
+        int i = 0;
+        for(int y = 0; y < canvas->height;y++){
+            for(int x = 0; x < canvas->width;x++){
+                Pixel p = canvas->pixels[i];
+                if(strcmp(canvas->pixels[i].ch, canvas->prevPixels[i].ch) != 0){
+                    setCharAt(x,y,p.ch);
+                    setCharAt(x+1,y,"\033[?25l");
+                    fflush(stdout); 
+                    setCursorPosition(canvas->width, canvas->height);
+                    canvas->prevPixels[i] = canvas->pixels[i];
+                }
+                i++;
+            }
+            // printf("\n");
+        }
+    }
+      
+
+
+    // printf("%s",canvas->render);
+    // int x = 0;
+    // for(int i = 0; i < canvas->width*canvas->height; i++){
+    //     Pixel pixel = canvas->pixels[i];
+    //
+    //     if(strlen(canvas->bgCh) > 1 && strlen(pixel.ch) < 2)
+    //         printf("%s%s%s ",pixel.color,pixel.bgcolor,pixel.ch);
+    //     else
+    //         printf("%s%s%s",pixel.color,pixel.bgcolor,pixel.ch);
+    //
+    //     printf("%s",RESET);
+    //     // if x == width -1 we start on the next row
+    //     if(x == canvas->width-1){
+    //         printf("\n");
+    //         x=-1;
+    //     }
+    //     x++;
+    // }
+    // printf("\033[?25l");
+}
+void setCursorPosition(int x, int y) {
+    printf("\033[%d;%dH", y+1, x+1);
 }
 
+void setCharAt(int x, int y, char *c) {
+    setCursorPosition(x, y);
+    printf("%s",c);
+}
 void setRender(Canvas *canvas){
 
     char* render = malloc(sizeof(char*)*canvas->height*canvas->width*3);
@@ -102,8 +162,25 @@ void setRender(Canvas *canvas){
         x++;
     }
     sprintf(render,"%s\033[?25l",render);
-    canvas->render = render;
 
+    if(canvas->render != NULL){
+        printf("check");
+        int i = 0;
+        for(int x = 0; x < canvas->width;x++){
+            for(int y = 0; y < canvas->height;y++){
+                printf("%c : %c",canvas->render[i], render[i]);
+                if(canvas->render[i] != render[i]){
+                    char str[2];
+                    str[0] = render[i];
+                    str[1] = '\0';
+                    setCharAt(x, y, str);
+                }
+                i++;
+            }
+        }
+    }
+    setCharAt(canvas->width, canvas->height, "");
+    canvas->render = render;
 }
 
 void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor){
