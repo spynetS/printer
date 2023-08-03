@@ -82,7 +82,7 @@ int main(){
     addSnake(head, 3,10);
 
 
-    Canvas *canvas = newCanvas(20,20,BG,BLACK);
+    Canvas *canvas = newCanvas(20,20,BG,BLACK,BG_BLACK);
      
 
     Pixel *apple = newPixel(10, 19, "🍎", RED, BG_BLACK);
@@ -137,8 +137,7 @@ int main(){
         }
 
 
-        // draw(canvas);
-        printf("%s",canvas->render);
+        draw(canvas);
         
         Snake *top = getLastSnake(head);
         if(top->pixel->x == apple->x && top->pixel->y == apple->y){

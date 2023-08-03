@@ -2,70 +2,55 @@
 #include <string.h>
 #include <stdlib.h>
 #include "Canvas.h"
-
-int w = 10;
-int h = 10;
-
-int pos[100*100];
-char **screen;
-
-
-int getIndexFromPosition(int _x, int _y){
-   int x = 0;
-   int y = 0;
-   for(int i = 0; i < w*h; i++){
-      if(x == _x && y == _y){
-         return i;
-      } 
-      if(x == w-1){
-         x = -1;
-         y++;
-      }
-      x++;
-   }
-   return 0;
-}
-void setCursorPosition(int x, int y);
-
-void setCharAt(int x, int y, char *c);
-
-void clearScreen(){
-   int index = 0;
-   for(int y = 0;y < h; y++){
-      for(int x = 0;x < w; x++){
-         if(pos[index] == 1){
-            setCharAt(x, y, "#");
-         }
-      }
-   }
-}
-
-void printBg(){
-   for(int y = 0; y < h; y++){
-      for(int x = 0; x < w; x++){
-         setCharAt(x, y, "#");
-      }
-   }
-
-}
-
+typedef struct{
+   int x;
+   int y;
+}Point;
 
 int main() {
    system("clear");
-   Canvas *canvas = newCanvas(10,10,"$","");
+   Canvas *canvas = newCanvas(10,10,"##",BLUE,BG_BLACK);
 
-   setFullScreen(canvas) ;
 
-   int x = 0;
+
+   Point pos;
+   pos.x = 0;
+   pos.y = 4;
+   
+   Point direction;
+   direction.x = 1;
+   direction.y = 0;
+
 
    while(1){
+      clearPixels(canvas);
 
-      setPixel(canvas,x-1,4,"$",RED,"");
-      setPixel(canvas,x,4,"*",RED,"");
+      char c = getKeyPressed();
+      if(c == 'w'){
+         direction.y = -1;
+         direction.x = 0;
+      }
+      if(c == 's'){
+         direction.y = 1;
+         direction.x = 0;
+      }
+      if(c == 'a'){
+         direction.y = 0;
+         direction.x = -1;
+      }
+      if(c == 'd'){
+         direction.y = 0;
+         direction.x = 1;
+      }
+
+      setPixel(canvas,10,10,"🍎","",BG_BLACK);
+      setPixel(canvas,pos.x,pos.y,"🐍",BLUE,BG_BLACK);
       draw(canvas);
 
       msleep(100);
-      x++;
+      pos.x+=direction.x;
+      pos.y+=direction.y;
+
    }
    
 

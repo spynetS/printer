@@ -29,6 +29,7 @@
 #define BG_CYAN   "\x1b[46m" 
 #define BG_WHITE  "\x1b[47m"
 
+
 #define BLACK  "\x1b[30m"
 #define RED    "\x1b[31m"
 #define GREEN  "\x1b[32m"
@@ -38,8 +39,11 @@
 #define CYAN   "\x1b[36m" 
 #define WHITE  "\x1b[37m"
 #define BG     "██"
-#define RESET "\x1b[0m"
 
+#define RESET "\x1b[0m"
+#define BG_RESET "\x1b[10m"
+
+#define NOCURSOR "\033[?25l"
 
 /** a struct to hold data a pixel needs */
 typedef struct pixel
@@ -102,8 +106,7 @@ typedef struct canvas
 {
     int width;
     int height;
-    char* bgCh;
-    char* color;
+    Pixel bgPixel;
     Pixel *pixels;
     Pixel *prevPixels;
     char** strings;
@@ -112,6 +115,7 @@ typedef struct canvas
 
 }Canvas;
 
+void initPixels(Canvas *canvas);
 /**  */
 void setCursorPosition(int x, int y);
 
@@ -140,9 +144,13 @@ void freeCanvas(Canvas *canvas);
 /** returns a new pixel with the data */
 Pixel *newPixel(int x, int y, char* ch, char* color, char* bgcolor);
 /** returns new canvas with the data */
-Canvas *newCanvas(int width, int height, char* bgCh, char* color);
+Canvas *newCanvas(int width, int height, char* bgCh, char* color, char* bgcolor);
 
 //mcs.c
 int kbhit(void); //returns 1 if key was pressed
 char getKeyPressed(); // returns char if it was pressed otherwise [
 int msleep(long msec);
+// Function to disable terminal echoing
+void disableEcho();
+// Function to enable terminal echoing
+void enableEcho();

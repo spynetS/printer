@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
+#include "Canvas.h"
 
 int msleep(long msec)
 {
@@ -27,6 +28,21 @@ int msleep(long msec)
     } while (res && errno == EINTR);
 
     return res;
+}
+// Function to disable terminal echoing
+void disableEcho() {
+    struct termios term;
+    tcgetattr(STDIN_FILENO, &term);
+    term.c_lflag &= ~ECHO;
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);
+}
+
+// Function to enable terminal echoing
+void enableEcho() {
+    struct termios term;
+    tcgetattr(STDIN_FILENO, &term);
+    term.c_lflag |= ECHO;
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
 int kbhit(void)

@@ -15,7 +15,7 @@ void setFullScreen(Canvas* canvas){
     }
 
     int width;
-    if(strlen(canvas->bgCh) > 1)
+    if(strlen(canvas->bgPixel.ch) > 1)
         width = size.ws_col/2;
     else
         width = size.ws_col;
@@ -23,46 +23,47 @@ void setFullScreen(Canvas* canvas){
 
     canvas->width = width;
     canvas->height = height;
-
-    free(canvas->pixels);
-    canvas->pixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
-
-    for(int i = 0; i < width*height; i ++){
-        canvas->pixels[i].ch = canvas->bgCh;
-        canvas->pixels[i].color = canvas->color;
-        canvas->pixels[i].bgcolor = canvas->color;
-    }
-    free(canvas->prevPixels);
-    canvas->prevPixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
-
-    for(int i = 0; i < width*height; i ++){
-        canvas->prevPixels[i].ch = "";
-        canvas->prevPixels[i].color = canvas->color;
-        canvas->prevPixels[i].bgcolor = canvas->color;
-    }
+    initPixels(canvas);
+   
 
 }
 
-Canvas *newCanvas(int width, int height, char* bgCh, char* color){
+void initPixels(Canvas *canvas){
+    if(canvas->pixels != NULL)
+        free(canvas->pixels);
+    int width = canvas->width;
+    int height = canvas->height;
+    canvas->pixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
+
+    for(int i = 0; i < canvas->width*height; i ++){
+        canvas->pixels[i].ch = canvas->bgPixel.ch;
+        canvas->pixels[i].color = canvas->bgPixel.color;
+        canvas->pixels[i].bgcolor = canvas->bgPixel.color;
+    }
+
+    if(canvas->prevPixels != NULL)
+        free(canvas->prevPixels);
+    canvas->prevPixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
+
+    for(int i = 0; i < width*height; i ++){
+        canvas->prevPixels[i].ch = "";
+        canvas->prevPixels[i].color = "";
+        canvas->prevPixels[i].bgcolor = "";
+    }
+}
+
+Canvas *newCanvas(int width, int height, char* bgCh, char* color, char* bgcolor){
+    disableEcho(); //dont display user input
     Canvas *canvas = malloc(sizeof(Canvas));
-    canvas->bgCh = bgCh;
-    canvas->color = color;
+    canvas->bgPixel.ch = bgCh;
+    canvas->bgPixel.color = color;
+    canvas->bgPixel.bgcolor = bgcolor;
     canvas->width = width;
     canvas->height = height;
 
-    canvas->pixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
-    for(int i = 0; i < width*height; i ++){
-        canvas->pixels[i].ch = bgCh;
-        canvas->pixels[i].color = color;
-        canvas->pixels[i].bgcolor = color;
-    }
-    canvas->prevPixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
-    for(int i = 0; i < width*height; i ++){
-        canvas->prevPixels[i].ch = "";
-        canvas->prevPixels[i].color = color;
-        canvas->prevPixels[i].bgcolor = color;
-    }
-    printf("\033[?25h");
+    initPixels(canvas);
+
+    //printf("\033[?25h");
     return canvas;
 }
 Pixel *newPixel(int x, int y, char* ch, char* color,char* bgcolor){
@@ -87,6 +88,8 @@ void freeCanvas(Canvas *canvas){
     printf("\033[?25h");
     freeStrings(canvas);
     free(canvas->strings);
+    free(canvas->pixels);
+    free(canvas->prevPixels);
     free(canvas);
 }
 
@@ -98,8 +101,13 @@ void draw(Canvas *canvas){
             for(int x = 0; x < canvas->width;x++){
                 Pixel p = canvas->pixels[i];
                 if(strcmp(canvas->pixels[i].ch, canvas->prevPixels[i].ch) != 0){
-                    setCharAt(x,y,p.ch);
-                    setCharAt(x+1,y,"\033[?25l");
+                    char *print = malloc(sizeof(char*));
+
+                    sprintf(print, "%s%s%s%s%s",p.color,p.bgcolor, p.ch,NOCURSOR,RESET);
+                    setCharAt(x,y,print);
+
+                    free(print);
+
                     fflush(stdout); 
                     setCursorPosition(canvas->width, canvas->height);
                     canvas->prevPixels[i] = canvas->pixels[i];
@@ -148,7 +156,7 @@ void setRender(Canvas *canvas){
     for(int i = 0; i < canvas->width*canvas->height; i++){
         Pixel pixel = canvas->pixels[i];
 
-        if(strlen(canvas->bgCh) > 1 && strlen(pixel.ch) < 2)
+        if(strlen(canvas->bgPixel.ch) > 1 && strlen(pixel.ch) < 2)
             sprintf(render,"%s%s%s%s ",render,pixel.color,pixel.bgcolor,pixel.ch);
         else
             sprintf(render,"%s%s%s%s",render,pixel.color,pixel.bgcolor,pixel.ch);
@@ -228,8 +236,9 @@ void clearPixels(Canvas *canvas){
     int index = 0;
     for(int y = 0; y < canvas->height; y++){
         for(int x = 0; x < canvas->width; x++){
-            canvas->pixels[index].ch = canvas->bgCh;
-            canvas->pixels[index].color = canvas->color;
+            canvas->pixels[index].ch = canvas->bgPixel.ch;
+            canvas->pixels[index].color = canvas->bgPixel.color;
+            canvas->pixels[index].bgcolor = canvas->bgPixel.bgcolor;
             index++;
         }
     }
