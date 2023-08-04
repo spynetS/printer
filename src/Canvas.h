@@ -48,9 +48,9 @@
 /** a struct to hold data a pixel needs */
 typedef struct pixel
 {
-    char* ch;
     int x;
     int y;
+    char* ch;
     char* color;
     char* bgcolor;
 
@@ -115,11 +115,27 @@ typedef struct canvas
 
 }Canvas;
 
+typedef struct rect{
+    int x;
+    int y;
+    int w;
+    int h;
+    char* ch;
+    char* color;
+    char* bgcolor;
+    
+
+}Rect;
+
 void initPixels(Canvas *canvas);
 /**  */
 void setCursorPosition(int x, int y);
 
 void setCharAt(int x, int y, char *c);
+
+void setRect(Canvas *canvas, Rect *rect);
+void setCircle(Canvas *canvas, int _x, int _y, int radius, char* ch, char* color, char* bg);
+void fillCircle(Canvas *canvas, int _x, int _y, int radius, char* ch, char* color, char* bg);
 //canvas.c
 void setRender(Canvas *canvas);
 /** Sets all pixelts to default pixels (clears all set) */

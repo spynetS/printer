@@ -9,8 +9,9 @@ typedef struct{
 
 int main() {
    system("clear");
-   Canvas *canvas = newCanvas(10,10,"##",BLUE,BG_BLACK);
-
+   Canvas *canvas = newCanvas(10,10,"##",BLACK,BG_BLACK);
+   //setFullScreen(canvas);
+   Pixel *apple = newPixel(5,5,"🍎","",BG_BLACK);
 
 
    Point pos;
@@ -21,9 +22,10 @@ int main() {
    direction.x = 1;
    direction.y = 0;
 
+   clearPixels(canvas);
 
    while(1){
-      clearPixels(canvas);
+      // clearPixels(canvas);
 
       char c = getKeyPressed();
       if(c == 'w'){
@@ -42,12 +44,14 @@ int main() {
          direction.y = 0;
          direction.x = 1;
       }
+      setPixelWithPixel(canvas, apple);
 
-      setPixel(canvas,10,10,"🍎","",BG_BLACK);
+      // setPixel(canvas,5,5,"🍎","",BG_BLACK);
       setPixel(canvas,pos.x,pos.y,"🐍",BLUE,BG_BLACK);
+      setPixel(canvas,pos.x+direction.x,pos.y+direction.y,"🤯",BLUE,BG_BLACK);
       draw(canvas);
 
-      msleep(100);
+      msleep(500);
       pos.x+=direction.x;
       pos.y+=direction.y;
 

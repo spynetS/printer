@@ -5,6 +5,8 @@
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <math.h>
+#include <time.h>
 
 void setFullScreen(Canvas* canvas){
     struct winsize size;
@@ -50,9 +52,12 @@ void initPixels(Canvas *canvas){
         canvas->prevPixels[i].color = "";
         canvas->prevPixels[i].bgcolor = "";
     }
+    // set bg 
+    clearPixels(canvas);
 }
 
 Canvas *newCanvas(int width, int height, char* bgCh, char* color, char* bgcolor){
+    system("clear");
     disableEcho(); //dont display user input
     Canvas *canvas = malloc(sizeof(Canvas));
     canvas->bgPixel.ch = bgCh;
@@ -94,11 +99,14 @@ void freeCanvas(Canvas *canvas){
 }
 
 void draw(Canvas *canvas){
-    
+
     if(canvas->prevPixels != NULL){
+
         int i = 0;
+        int bgSize = strlen(canvas->bgPixel.ch);
         for(int y = 0; y < canvas->height;y++){
-            for(int x = 0; x < canvas->width;x++){
+            
+            for(int x = 0; x < canvas->width*bgSize;x+=bgSize){
                 Pixel p = canvas->pixels[i];
                 if(strcmp(canvas->pixels[i].ch, canvas->prevPixels[i].ch) != 0){
                     char *print = malloc(sizeof(char*));
@@ -114,32 +122,44 @@ void draw(Canvas *canvas){
                 }
                 i++;
             }
-            // printf("\n");
+        }
+    }    
+}
+
+void setRect(Canvas *canvas,Rect *rect){
+    int _x = rect->x;
+    int _y = rect->y;
+    int w = rect->w;
+    int h = rect->h;
+    char *ch = rect->ch;
+    char *color = rect->color;
+    char *bgcolor = rect->bgcolor;
+
+
+    for(int y = 0; y < h; y++){
+        for(int x = 0; x < w; x++){
+            setPixel(canvas, _x+x, _y+y, ch, color, bgcolor);
         }
     }
-      
 
-
-    // printf("%s",canvas->render);
-    // int x = 0;
-    // for(int i = 0; i < canvas->width*canvas->height; i++){
-    //     Pixel pixel = canvas->pixels[i];
-    //
-    //     if(strlen(canvas->bgCh) > 1 && strlen(pixel.ch) < 2)
-    //         printf("%s%s%s ",pixel.color,pixel.bgcolor,pixel.ch);
-    //     else
-    //         printf("%s%s%s",pixel.color,pixel.bgcolor,pixel.ch);
-    //
-    //     printf("%s",RESET);
-    //     // if x == width -1 we start on the next row
-    //     if(x == canvas->width-1){
-    //         printf("\n");
-    //         x=-1;
-    //     }
-    //     x++;
-    // }
-    // printf("\033[?25l");
 }
+
+void setCircle(Canvas *canvas, int _x, int _y, int radius, char* ch, char* color, char* bg){
+   
+        for(int i = 1; i < 360; i++){
+            int x = (int) radius * cos(i);
+            int y = (int) radius * sin(i);
+            setPixel(canvas,_x+x,_y+y,ch,color,bg);
+        }
+}
+
+void fillCircle(Canvas *canvas, int _x, int _y, int radius, char* ch, char* color, char* bg){
+    while(radius > 1){
+        setCircle(canvas,_x,_y,radius,ch,color,bg);
+        radius--;
+    }
+}
+
 void setCursorPosition(int x, int y) {
     printf("\033[%d;%dH", y+1, x+1);
 }
