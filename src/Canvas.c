@@ -35,6 +35,8 @@ void initPixels(Canvas *canvas){
         free(canvas->pixels);
     int width = canvas->width;
     int height = canvas->height;
+
+
     canvas->pixels = (Pixel*)malloc(sizeof(Pixel)*width*height);
 
     for(int i = 0; i < canvas->width*height; i ++){
@@ -60,6 +62,8 @@ Canvas *newCanvas(int width, int height, char* bgCh, char* color, char* bgcolor)
     system("clear");
     disableEcho(); //dont display user input
     Canvas *canvas = malloc(sizeof(Canvas));
+    canvas->x = 0;
+    canvas->y = 0;
     canvas->bgPixel.ch = bgCh;
     canvas->bgPixel.color = color;
     canvas->bgPixel.bgcolor = bgcolor;
@@ -104,20 +108,20 @@ void draw(Canvas *canvas){
 
         int i = 0;
         int bgSize = strlen(canvas->bgPixel.ch);
+        //for unicode it gets fucked otherwise if a unicode is looking like 1 it is actually 4 
+        bgSize = bgSize > 1 ? 2 : 1;
         for(int y = 0; y < canvas->height;y++){
-            
             for(int x = 0; x < canvas->width*bgSize;x+=bgSize){
                 Pixel p = canvas->pixels[i];
-                if(strcmp(canvas->pixels[i].ch, canvas->prevPixels[i].ch) != 0){
-                    char *print = malloc(sizeof(char*));
-
+                if(strcmp(canvas->pixels[i].ch, canvas->prevPixels[i].ch) != 0 || strcmp(canvas->pixels[i].color, canvas->prevPixels[i].color) != 0){
+                    char *print = malloc(sizeof(char*)*10);
                     sprintf(print, "%s%s%s%s%s",p.color,p.bgcolor, p.ch,NOCURSOR,RESET);
-                    setCharAt(x,y,print);
+                    setCharAt(x+canvas->x,y+canvas->y,print);
 
                     free(print);
 
                     fflush(stdout); 
-                    setCursorPosition(canvas->width, canvas->height);
+                    setCursorPosition(canvas->width+canvas->x, canvas->height+canvas->height);
                     canvas->prevPixels[i] = canvas->pixels[i];
                 }
                 i++;
@@ -170,48 +174,13 @@ void setCharAt(int x, int y, char *c) {
 }
 void setRender(Canvas *canvas){
 
-    char* render = malloc(sizeof(char*)*canvas->height*canvas->width*3);
-    
-    int x = 0;
-    for(int i = 0; i < canvas->width*canvas->height; i++){
-        Pixel pixel = canvas->pixels[i];
-
-        if(strlen(canvas->bgPixel.ch) > 1 && strlen(pixel.ch) < 2)
-            sprintf(render,"%s%s%s%s ",render,pixel.color,pixel.bgcolor,pixel.ch);
-        else
-            sprintf(render,"%s%s%s%s",render,pixel.color,pixel.bgcolor,pixel.ch);
-
-        sprintf(render,"%s%s",render,RESET);
-        // if x == width -1 we start on the next row
-        if(x == canvas->width-1){
-            sprintf(render,"%s\n",render);
-            x=-1;
-        }
-        x++;
-    }
-    sprintf(render,"%s\033[?25l",render);
-
-    if(canvas->render != NULL){
-        printf("check");
-        int i = 0;
-        for(int x = 0; x < canvas->width;x++){
-            for(int y = 0; y < canvas->height;y++){
-                printf("%c : %c",canvas->render[i], render[i]);
-                if(canvas->render[i] != render[i]){
-                    char str[2];
-                    str[0] = render[i];
-                    str[1] = '\0';
-                    setCharAt(x, y, str);
-                }
-                i++;
-            }
-        }
-    }
-    setCharAt(canvas->width, canvas->height, "");
-    canvas->render = render;
+}
+void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor){
+    setPixelRaw(canvas,_x+1, _y +1, ch,color,bgcolor);
 }
 
-void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor){
+
+void setPixelRaw(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor){
     int index = 0;
     for(int y = 0; y < canvas->height; y++){
         for(int x = 0; x < canvas->width; x++){
@@ -280,4 +249,41 @@ void setText(Canvas *canvas, int _x, int _y, char* text, char* color, char* bgco
         
         setPixel(canvas, _x+i, _y, newStr, color, bgcolor);
     }
+}
+void setBorder(Canvas *canvas, int borderWith){
+    char* rightBorder = "┃";
+    char* leftBorder = "┃";
+    char* bottom = "━━";
+    char* top = "━━";
+    char* joinTopRight = "┏━";
+    char* joinBottomRight = "┗━";
+    char* joinTopLeft = "┓";
+    char* joinBottomLeft = "┚";
+
+    // vertical lines
+    for(int i = 0; i < canvas->height; i ++){
+        setCharAt(canvas->x,i+canvas->y,rightBorder);
+        setCharAt(canvas->width*2+canvas->x,i+canvas->y,rightBorder);
+    }
+    // horzontal lines
+    for(int i = 0; i < canvas->width*2; i +=2){
+        setCharAt(i+canvas->x,canvas->y,top);
+        setCharAt(i+canvas->x,canvas->height+canvas->y,bottom);
+    }
+    setCharAt(canvas->x,canvas->y,joinTopRight);
+    setCharAt(0+canvas->x,canvas->height+canvas->y,joinBottomRight);
+    setCharAt(canvas->width*2+canvas->x,0+canvas->y,joinTopLeft);
+    setCharAt(canvas->width*2+canvas->x, canvas->height+canvas->y,joinBottomLeft);
+
+
+}
+struct winsize win;
+
+unsigned int termWidth(){
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &win);
+    return (win.ws_col);
+}
+unsigned int termHeight(){
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &win);
+    return (win.ws_row);
 }
