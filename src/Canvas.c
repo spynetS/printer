@@ -115,7 +115,7 @@ void draw(Canvas *canvas){
                 Pixel p = canvas->pixels[i];
                 if(strcmp(canvas->pixels[i].ch, canvas->prevPixels[i].ch) != 0 || strcmp(canvas->pixels[i].color, canvas->prevPixels[i].color) != 0){
                     char *print = malloc(sizeof(char*)*10);
-                    sprintf(print, "%s%s%s%s%s",p.color,p.bgcolor, p.ch,NOCURSOR,RESET);
+                    sprintf(print, "%s%s%s%s%s",p.color,p.bgcolor, p.ch,HIDE_CURSOR,RESET);
                     setCharAt(x+canvas->x,y+canvas->y,print);
 
                     free(print);
@@ -242,14 +242,30 @@ void addString(Canvas *canvas, char *newStr){
 void setText(Canvas *canvas, int _x, int _y, char* text, char* color, char* bgcolor){
     int len = strlen(text);
     for(int i = 0; i < len; i++){
-        char *newStr = malloc(sizeof(char)*2);
-        newStr[0] = text[i];
-        newStr[1] = '\0';
-        addString(canvas, newStr);
-        
-        setPixel(canvas, _x+i, _y, newStr, color, bgcolor);
+        if(strlen(canvas->bgPixel.ch) > 1){
+            char *newStr = malloc(sizeof(char)*3);
+            newStr[0] = text[i];
+            newStr[1] = ' ';
+            newStr[2] = '\0';
+            addString(canvas, newStr);
+            setPixel(canvas, _x+i, _y, newStr, color, bgcolor);
+        }
+        else{
+            char *newStr = malloc(sizeof(char)*2);
+            newStr[0] = text[i];
+            newStr[1] = '\0';
+            addString(canvas, newStr);
+            setPixel(canvas, _x+i, _y, newStr, color, bgcolor);
+        }
+
     }
 }
+
+void setCenterText(Canvas *canvas, int _x, int _y, char* text, char* color, char* bgcolor){
+    int size = strlen(text)/2;
+    setText(canvas,_x-size,_y,text,color,bgcolor);
+}
+
 void setBorder(Canvas *canvas, int borderWith){
     char* rightBorder = "┃";
     char* leftBorder = "┃";
@@ -260,20 +276,22 @@ void setBorder(Canvas *canvas, int borderWith){
     char* joinTopLeft = "┓";
     char* joinBottomLeft = "┚";
 
+    int scale = strlen(canvas->bgPixel.ch);
+
     // vertical lines
     for(int i = 0; i < canvas->height; i ++){
         setCharAt(canvas->x,i+canvas->y,rightBorder);
-        setCharAt(canvas->width*2+canvas->x,i+canvas->y,rightBorder);
+        setCharAt(canvas->width*scale+canvas->x,i+canvas->y,rightBorder);
     }
     // horzontal lines
-    for(int i = 0; i < canvas->width*2; i +=2){
+    for(int i = 0; i < canvas->width*scale; i +=scale){
         setCharAt(i+canvas->x,canvas->y,top);
         setCharAt(i+canvas->x,canvas->height+canvas->y,bottom);
     }
     setCharAt(canvas->x,canvas->y,joinTopRight);
     setCharAt(0+canvas->x,canvas->height+canvas->y,joinBottomRight);
-    setCharAt(canvas->width*2+canvas->x,0+canvas->y,joinTopLeft);
-    setCharAt(canvas->width*2+canvas->x, canvas->height+canvas->y,joinBottomLeft);
+    setCharAt(canvas->width*scale+canvas->x,0+canvas->y,joinTopLeft);
+    setCharAt(canvas->width*scale+canvas->x, canvas->height+canvas->y,joinBottomLeft);
 
 
 }
