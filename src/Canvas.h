@@ -45,7 +45,8 @@
 #define RESET "\x1b[0m"
 #define BG_RESET "\x1b[10m"
 
-#define NOCURSOR "\033[?25l"
+#define HIDE_CURSOR "\033[?25l"
+#define SHOW_CURSOR "\033[?25h"
 
 /** a struct to hold data a pixel needs */
 typedef struct pixel
@@ -152,6 +153,8 @@ void setPixelWithPixel(Canvas *canvas, Pixel *pixel);
 /** Sets the text at begining of x and at row y */
 void setText(Canvas *canvas, int _x, int _y, char* text, char* color, char* bgcolor);
 
+void setCenterText(Canvas *canvas, int _x, int _y, char* text, char* color, char* bgcolor);
+
 void setBgOfPixel(Canvas *canvas, int x, int y, char* bgcolor);
 /** Internal function. Adds string to a list so we can free it later */
 void addString(Canvas*, char *newStr);
@@ -166,6 +169,7 @@ Pixel *newPixel(int x, int y, char* ch, char* color, char* bgcolor);
 /** returns new canvas with the data */
 Canvas *newCanvas(int width, int height, char* bgCh, char* color, char* bgcolor);
 
+// THIS SHOULD BE RUN AFTER THE DRAW
 void setBorder(Canvas *canvas,int borderWith);
 
 //mcs.c
