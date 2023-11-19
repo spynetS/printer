@@ -271,10 +271,6 @@ void setBorder(Canvas* canvas, int borderWidth){
 }
 
 void drawBorder(Canvas *canvas, int borderWidth){
-    /* canvas->width ++; */
-    /* canvas->height ++; */
-    canvas->x ++;
-    canvas->y ++;
 
     char* rightBorder = "┃";
     char* leftBorder = "┃";
