@@ -172,7 +172,7 @@ Canvas *newCanvas(int width, int height, char* bgCh, char* color, char* bgcolor)
 // DEPRICATED USE DRAW BORDER INSTEAD (just new name tbh)
 void setBorder(Canvas *canvas,int borderWith);
 
-// THIS SHOULD BE RUN ONCE
+// THIS SHOULD BE RUN AFTER THE DRAW FUNCTION
 // if the canvas is at x,y=0 set it to be x,y=1 canvas->x = 1...
 // TODO borderwdth change borderwidth (does noting now)
 void drawBorder(Canvas *canvas,int borderWith);
