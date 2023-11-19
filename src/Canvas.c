@@ -176,7 +176,7 @@ void setRender(Canvas *canvas){
 
 }
 void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor){
-    setPixelRaw(canvas,_x+1, _y +1, ch,color,bgcolor);
+    setPixelRaw(canvas,_x, _y , ch,color,bgcolor);
 }
 
 
@@ -266,7 +266,16 @@ void setCenterText(Canvas *canvas, int _x, int _y, char* text, char* color, char
     setText(canvas,_x-size,_y,text,color,bgcolor);
 }
 
-void setBorder(Canvas *canvas, int borderWith){
+void setBorder(Canvas* canvas, int borderWidth){
+  drawBorder(canvas,borderWidth);
+}
+
+void drawBorder(Canvas *canvas, int borderWidth){
+    /* canvas->width ++; */
+    /* canvas->height ++; */
+    canvas->x ++;
+    canvas->y ++;
+
     char* rightBorder = "┃";
     char* leftBorder = "┃";
     char* bottom = "━━";
@@ -280,17 +289,17 @@ void setBorder(Canvas *canvas, int borderWith){
 
     // vertical lines
     for(int i = 0; i < canvas->height; i ++){
-        setCharAt(canvas->x,i+canvas->y,rightBorder);
+        setCharAt(canvas->x-1,i+canvas->y,rightBorder);
         setCharAt(canvas->width*scale+canvas->x,i+canvas->y,rightBorder);
     }
     // horzontal lines
     for(int i = 0; i < canvas->width*scale; i +=scale){
-        setCharAt(i+canvas->x,canvas->y,top);
+        setCharAt(i+canvas->x,canvas->y-1,top);
         setCharAt(i+canvas->x,canvas->height+canvas->y,bottom);
     }
-    setCharAt(canvas->x,canvas->y,joinTopRight);
-    setCharAt(0+canvas->x,canvas->height+canvas->y,joinBottomRight);
-    setCharAt(canvas->width*scale+canvas->x,0+canvas->y,joinTopLeft);
+    setCharAt(canvas->x-1,canvas->y-1,joinTopRight);
+    setCharAt(canvas->x-1,canvas->height+canvas->y,joinBottomRight);
+    setCharAt(canvas->width*scale+canvas->x, canvas->y-1,joinTopLeft);
     setCharAt(canvas->width*scale+canvas->x, canvas->height+canvas->y,joinBottomLeft);
 
 

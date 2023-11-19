@@ -169,8 +169,12 @@ Pixel *newPixel(int x, int y, char* ch, char* color, char* bgcolor);
 /** returns new canvas with the data */
 Canvas *newCanvas(int width, int height, char* bgCh, char* color, char* bgcolor);
 
-// THIS SHOULD BE RUN AFTER THE DRAW
+// DEPRICATED USE DRAW BORDER INSTEAD (just new name tbh)
 void setBorder(Canvas *canvas,int borderWith);
+
+// THIS SHOULD BE RUN BEFORE DRAW
+// TODO borderwdth change borderwidth (does noting now)
+void drawBorder(Canvas *canvas,int borderWith);
 
 //mcs.c
 int kbhit(void); //returns 1 if key was pressed
