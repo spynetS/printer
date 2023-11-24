@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
-#include "Canvas.h"
+#include "printer.h"
 
 int msleep(long msec)
 {
