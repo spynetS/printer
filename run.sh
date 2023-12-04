@@ -1,4 +1,2 @@
 
-gcc ./src/msc.c ./src/Canvas.c $1 -lm
-
-./a.out
+gcc ./src/msc.c ./src/Canvas.c ./src/main.c -lm -o main

@@ -148,7 +148,10 @@ void clearPixels(Canvas *canvas);
 /** sets the pixel at x,y with the data */
 void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor);
 void setPixelRaw(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor);
-/** set the pixel with the pixel arg */
+
+/** set the pixel with the pixel arg
+ *  REMEMBER TO FREE IT YOURSELF
+ * */
 void setPixelWithPixel(Canvas *canvas, Pixel *pixel);
 /** Sets the text at begining of x and at row y */
 void setText(Canvas *canvas, int _x, int _y, char* text, char* color, char* bgcolor);
