@@ -273,7 +273,7 @@ void setBorder(Canvas* canvas, int borderWidth){
 void drawBorder(Canvas *canvas, int borderWidth){
 
     char* rightBorder = "┃";
-    char* leftBorder = "┃";
+		//    char* leftBorder = "┃";
     char* bottom = "━━";
     char* top = "━━";
     char* joinTopRight = "┏━";
