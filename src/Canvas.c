@@ -172,9 +172,9 @@ void setCharAt(int x, int y, char *c) {
     setCursorPosition(x, y);
     printf("%s",c);
 }
-void setRender(Canvas *canvas){
+/* void setRender(Canvas *canvas){ */
 
-}
+/* } */
 void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor){
     setPixelRaw(canvas,_x, _y , ch,color,bgcolor);
 }
@@ -208,9 +208,9 @@ Pixel *getPixel(Canvas *canvas, int _x, int _y){
 }
 
 
-void setBgOfPixel(Canvas *canvas, int x, int y, char* bgcolor){
-    getPixel(canvas, x, y);
-}
+/* void setBgOfPixel(Canvas *canvas, int x, int y){ */
+/*     getPixel(canvas, x, y); */
+/* } */
 
 void setPixelWithPixel(Canvas *canvas, Pixel *pixel){
     setPixel(canvas, pixel->x, pixel->y, pixel->ch, pixel->color, pixel->bgcolor);
@@ -271,6 +271,7 @@ void setBorder(Canvas* canvas, int borderWidth){
 }
 
 void drawBorder(Canvas *canvas, int borderWidth){
+	(void)borderWidth;
 
     char* rightBorder = "┃";
 		//    char* leftBorder = "┃";
