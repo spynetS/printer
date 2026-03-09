@@ -179,19 +179,14 @@ void setPixel(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcol
     setPixelRaw(canvas,_x, _y , ch,color,bgcolor);
 }
 
-
 void setPixelRaw(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bgcolor){
-    int index = 0;
-    for(int y = 0; y < canvas->height; y++){
-        for(int x = 0; x < canvas->width; x++){
-            if(_x == x && _y == y){
-                canvas->pixels[index].ch = ch;
-                canvas->pixels[index].color = color;
-                canvas->pixels[index].bgcolor = bgcolor;
-            }
-            index++;
-        }
-    }
+    if(_x < 0 || _x >= canvas->width || _y < 0 || _y >= canvas->height)
+        return;  // optional: bounds check
+
+    int index = _y * canvas->width + _x;  // linear index
+    canvas->pixels[index].ch = ch;
+    canvas->pixels[index].color = color;
+    canvas->pixels[index].bgcolor = bgcolor;
 }
 
 Pixel *getPixel(Canvas *canvas, int _x, int _y){
@@ -222,15 +217,12 @@ void clearPixels(Canvas *canvas){
     //free the strings saved 
     freeStrings(canvas);
 
-    int index = 0;
-    for(int y = 0; y < canvas->height; y++){
-        for(int x = 0; x < canvas->width; x++){
-            canvas->pixels[index].ch = canvas->bgPixel.ch;
-            canvas->pixels[index].color = canvas->bgPixel.color;
-            canvas->pixels[index].bgcolor = canvas->bgPixel.bgcolor;
-            index++;
-        }
-    }
+		int totalPixels = canvas->width * canvas->height;
+		for(int i = 0; i < totalPixels; i++) {
+			canvas->pixels[i].ch = canvas->bgPixel.ch;
+			canvas->pixels[i].color = canvas->bgPixel.color;
+			canvas->pixels[i].bgcolor = canvas->bgPixel.bgcolor;
+		}
 }
 
 void addString(Canvas *canvas, char *newStr){

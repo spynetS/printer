@@ -31,6 +31,7 @@
 #define BG_CYAN   "\x1b[46m" 
 #define BG_WHITE  "\x1b[47m"
 
+#define TRANS  ""
 
 #define BLACK  "\x1b[30m"
 #define RED    "\x1b[31m"
