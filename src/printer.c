@@ -1,6 +1,7 @@
 #include "./printer.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <sys/ioctl.h>
 #include <stdio.h>
@@ -13,53 +14,84 @@ void set_char_at(int x, int y, char *c) {
 	printf("%s",c);
 }
 
+void free_canvas(Canvas* canvas) {
+	free(canvas);
+}
+
 Canvas* new_canvas(int w, int h) {
 	Canvas* canvas = malloc(sizeof(Canvas));
 	canvas->w = w;
 	canvas->h = h;
 
 	canvas->bg = RESET" ";
-
-	canvas->buffer1 = malloc(sizeof(char*) * w * h);
-	for(int i = 0; i < w * h; i ++) {
-		canvas->buffer1[i] = canvas->bg;
+	canvas->pixels = malloc(sizeof(Pixel) * w * h);
+	canvas->prev_pixels = malloc(sizeof(Pixel) * w * h);
+	for(int i = 0; i < canvas->w * canvas->h; i++){
+		canvas->pixels[i].r = 0;
+		canvas->pixels[i].g = 0;
+		canvas->pixels[i].b = 0;
+		canvas->prev_pixels[i].r = 1;
+		canvas->prev_pixels[i].g = 1;
+		canvas->prev_pixels[i].b = 1;
 	}
-
 	return canvas;
 }
 
 // TODO only redraw the changed pixels
 void draw (Canvas* canvas) {
 
-	// double buffer change
-	char** tmp = canvas->buffer2;
-	canvas->buffer2 = canvas->buffer1;
-	canvas->buffer1 = malloc(sizeof(char*) * canvas->w * canvas->h);
-	for(int i = 0; i < canvas->w * canvas->h; i ++) {
-		canvas->buffer1[i] = canvas->bg;
-	}
-
-	for(int y = 0; y < canvas->h-1; y ++) {
-		for(int x = 0; x < canvas->w-1; x ++) {
+	int skipped = 0;
+	for(int y = 0; y < canvas->h; y ++) {
+		for(int x = 0; x < canvas->w; x ++) {
 			int index = y * canvas->w + x;
-
-			char* value = canvas->buffer2[index];
-			if(value != NULL)
-				set_char_at(x,y,value);
+			if(canvas->pixels[index].r == 0 &&
+				 canvas->pixels[index].g == 0 &&
+				 canvas->pixels[index].b == 0){
+				set_char_at(x, y, RESET" ");
+			}
+			else if (canvas->pixels[index].r != canvas->prev_pixels[index].r ||
+					canvas->pixels[index].g != canvas->prev_pixels[index].b ||
+					canvas->pixels[index].b != canvas->prev_pixels[index].g){
+							
+				char* value = (char*) malloc(64);
+				snprintf(value, 64, "\033[48;2;%d;%d;%dm ",
+								 canvas->pixels[index].r,
+								 canvas->pixels[index].g,
+								 canvas->pixels[index].b);
+				set_char_at(x, y, value);
+			}
+			else{
+				skipped++;
+			}
 		}
 	}
+	
+	if(canvas->prev_pixels != NULL)
+		free(canvas->prev_pixels);
+	canvas->prev_pixels = canvas->pixels;
+	canvas->pixels = malloc(sizeof(Pixel) * canvas->w * canvas->h);
+	for(int i = 0; i < canvas->w * canvas->h; i++){
+		canvas->pixels[i].r = 0;
+		canvas->pixels[i].g = 0;
+		canvas->pixels[i].b = 0;
+	}
+
 }
 
 
 void set_pixel(Canvas* canvas, int x, int y, uint8_t r, uint8_t g, uint8_t b) {
 	if (x < 0 || x >= canvas->w || y < 0 || y >= canvas->h)
 		return;
-
 	int index = y * canvas->w + x;
-	
-	char* value = (char*) malloc(64);
-	snprintf(value, 64, "\033[48;2;%d;%d;%dm ", r, g, b);
-	canvas->buffer1[index] = value;
+
+	canvas->pixels[index].r = r;
+	canvas->pixels[index].g = g;
+	canvas->pixels[index].b = b;
+
+
+	/* char* value = (char*) malloc(64); */
+	/* snprintf(value, 64, "\033[48;2;%d;%d;%dm ", r, g, b); */
+
 }
 
 struct winsize win;

@@ -7,16 +7,20 @@
 #define HIDE_CURSOR "\033[?25l"
 #define SHOW_CURSOR "\033[?25h"
 
+typedef struct {
+	uint8_t r,g,b;
+} Pixel;
 
 typedef struct {
-	char** buffer1;
-	char** buffer2;
+	Pixel* pixels;
+	Pixel* prev_pixels;
 	int w, h;
 	int x, y;
 	char* bg;
 } Canvas;
 
 Canvas* new_canvas(int w, int h);
+void free_canvas(Canvas* canvas);
 
 void set_pixel (Canvas* canvas, int x, int y, uint8_t r, uint8_t g, uint8_t b);
 void set_char_fg (int x, int y, const uint8_t* value, uint8_t r, uint8_t g, uint8_t b);
