@@ -88,6 +88,7 @@ Pixel *newPixel(int x, int y, char* ch, char* color,char* bgcolor){
 
 void freeStrings(Canvas *canvas){
     for(int i = 0 ; i < canvas->numStrings;i++){
+			if(canvas->strings[i] != NULL)
         free(canvas->strings[i]);
     }
     canvas->numStrings = 0;
@@ -97,6 +98,11 @@ void freeCanvas(Canvas *canvas){
     printf("\033[?25h");
     freeStrings(canvas);
     free(canvas->strings);
+
+		for(int i = 0; i < canvas->width * canvas->height; i ++)
+			if(canvas->pixels[i].ch != NULL)
+				free(canvas->pixels[i].ch);
+				
     free(canvas->pixels);
     free(canvas->prevPixels);
     free(canvas);
@@ -184,7 +190,9 @@ void setPixelRaw(Canvas *canvas, int _x, int _y, char* ch, char* color, char* bg
         return;  // optional: bounds check
 
     int index = _y * canvas->width + _x;  // linear index
-    canvas->pixels[index].ch = ch;
+		if(canvas->pixels[index].ch != NULL && canvas->pixels[index].ch != canvas->bgPixel.ch)
+			free(canvas->pixels[index].ch);
+    canvas->pixels[index].ch = strdup(ch);
     canvas->pixels[index].color = color;
     canvas->pixels[index].bgcolor = bgcolor;
 }
@@ -219,6 +227,9 @@ void clearPixels(Canvas *canvas){
 
 		int totalPixels = canvas->width * canvas->height;
 		for(int i = 0; i < totalPixels; i++) {
+			
+			if(canvas->pixels[i].ch != NULL && canvas->pixels[i].ch != canvas->bgPixel.ch)
+				free(canvas->pixels[i].ch);
 			canvas->pixels[i].ch = canvas->bgPixel.ch;
 			canvas->pixels[i].color = canvas->bgPixel.color;
 			canvas->pixels[i].bgcolor = canvas->bgPixel.bgcolor;
