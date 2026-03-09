@@ -15,6 +15,8 @@ void set_char_at(int x, int y, char *c) {
 }
 
 void free_canvas(Canvas* canvas) {
+	free(canvas->pixels);
+	free(canvas->prev_pixels);
 	free(canvas);
 }
 
@@ -44,6 +46,7 @@ void draw (Canvas* canvas) {
 	for(int y = 0; y < canvas->h; y ++) {
 		for(int x = 0; x < canvas->w; x ++) {
 			int index = y * canvas->w + x;
+			// if back we draw transparent
 			if(canvas->pixels[index].r == 0 &&
 				 canvas->pixels[index].g == 0 &&
 				 canvas->pixels[index].b == 0){
@@ -59,6 +62,7 @@ void draw (Canvas* canvas) {
 								 canvas->pixels[index].g,
 								 canvas->pixels[index].b);
 				set_char_at(x, y, value);
+				free(value);
 			}
 			else{
 				skipped++;
@@ -87,10 +91,6 @@ void set_pixel(Canvas* canvas, int x, int y, uint8_t r, uint8_t g, uint8_t b) {
 	canvas->pixels[index].r = r;
 	canvas->pixels[index].g = g;
 	canvas->pixels[index].b = b;
-
-
-	/* char* value = (char*) malloc(64); */
-	/* snprintf(value, 64, "\033[48;2;%d;%d;%dm ", r, g, b); */
 
 }
 
