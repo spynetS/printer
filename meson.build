@@ -1,6 +1,6 @@
 
 printer_sources = [
-  'src/Canvas.c',
+  'src/printer.c',
   'src/msc.c'
 ]
 

@@ -14,5 +14,14 @@ int main(){
 			}
 	}
 	draw(canvas);
+	msleep(1000);
+	for(int y = 0; y < termHeight()/2; y ++) {
+		for(int x = 0; x < termWidth()/2; x ++) {
+			set_pixel(canvas, x,y,x+10,y+10,x*y);
+		}
+	}
+	draw(canvas);
+
+	
 	return 0;
 }
