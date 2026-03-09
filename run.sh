@@ -1,2 +1,1 @@
-gcc ./src/msc.c ./src/Canvas.c ./src/main.c -lm -o main
-./main
+gcc ./src/msc.c ./src/printer.c ./examples/example1.c -lm -o main
