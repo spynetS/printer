@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "./logger.h"
 
 #include <sys/ioctl.h>
 #include <stdio.h>
@@ -15,13 +16,23 @@ void set_char_at(int x, int y, char *c) {
 }
 
 void free_canvas(Canvas* canvas) {
+	close_logger(canvas->logger);
+	
 	free(canvas->pixels);
 	free(canvas->prev_pixels);
 	free(canvas);
+
 }
 
 Canvas* new_canvas(int w, int h) {
+	Logger logger = {0};
+	if(init_logger(&logger, "./log.txt") == 1) {
+		exit(1);
+	}
+
 	Canvas* canvas = malloc(sizeof(Canvas));
+	canvas->logger = &logger;
+	
 	canvas->w = w;
 	canvas->h = h;
 
@@ -39,7 +50,7 @@ Canvas* new_canvas(int w, int h) {
 	return canvas;
 }
 
-// TODO only redraw the changed pixels
+
 void draw (Canvas* canvas) {
 
 	int skipped = 0;
@@ -47,15 +58,16 @@ void draw (Canvas* canvas) {
 		for(int x = 0; x < canvas->w; x ++) {
 			int index = y * canvas->w + x;
 			// if back we draw transparent
-			if(canvas->pixels[index].r == 0 &&
-				 canvas->pixels[index].g == 0 &&
-				 canvas->pixels[index].b == 0){
-				set_char_at(x, y, RESET" ");
-			}
-			else if (canvas->pixels[index].r != canvas->prev_pixels[index].r ||
+			if (canvas->pixels[index].r != canvas->prev_pixels[index].r ||
 					canvas->pixels[index].g != canvas->prev_pixels[index].b ||
 					canvas->pixels[index].b != canvas->prev_pixels[index].g){
-							
+				if(canvas->pixels[index].r == 0 &&
+					 canvas->pixels[index].g == 0 &&
+					 canvas->pixels[index].b == 0){
+					set_char_at(x, y, RESET" ");
+					continue;
+				}
+
 				char* value = (char*) malloc(64);
 				snprintf(value, 64, "\033[48;2;%d;%d;%dm ",
 								 canvas->pixels[index].r,
@@ -69,6 +81,10 @@ void draw (Canvas* canvas) {
 			}
 		}
 	}
+	
+	/* char msg[255]; */
+	/* sprintf(msg,"%d", skipped); */
+	/* log_message(canvas->logger, msg); */
 	
 	if(canvas->prev_pixels != NULL)
 		free(canvas->prev_pixels);

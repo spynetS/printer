@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include "./logger.h"
 
 #define RESET "\x1b[0m"
 #define BG_RESET "\x1b[10m"
@@ -12,6 +13,7 @@ typedef struct {
 } Pixel;
 
 typedef struct {
+	Logger* logger;
 	Pixel* pixels;
 	Pixel* prev_pixels;
 	int w, h;
