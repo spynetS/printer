@@ -1,7 +1,6 @@
 
 printer_sources = [
   'src/printer.c',
-  'src/logger.c',
   'src/msc.c'
 ]
 

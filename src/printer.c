@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "./logger.h"
 
 #include <sys/ioctl.h>
 #include <stdio.h>
@@ -16,8 +15,6 @@ void set_char_at(int x, int y, char *c) {
 }
 
 void free_canvas(Canvas* canvas) {
-	close_logger(canvas->logger);
-	
 	free(canvas->pixels);
 	free(canvas->prev_pixels);
 	free(canvas);
@@ -25,13 +22,7 @@ void free_canvas(Canvas* canvas) {
 }
 
 Canvas* new_canvas(int w, int h) {
-	Logger logger = {0};
-	if(init_logger(&logger, "./log.txt") == 1) {
-		exit(1);
-	}
-
 	Canvas* canvas = malloc(sizeof(Canvas));
-	canvas->logger = &logger;
 	
 	canvas->w = w;
 	canvas->h = h;
@@ -81,10 +72,6 @@ void draw (Canvas* canvas) {
 			}
 		}
 	}
-	
-	/* char msg[255]; */
-	/* sprintf(msg,"%d", skipped); */
-	/* log_message(canvas->logger, msg); */
 	
 	if(canvas->prev_pixels != NULL)
 		free(canvas->prev_pixels);
